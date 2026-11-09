@@ -13,18 +13,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # تم التحديث إلى الإصدار v5 لتجنب تحذيرات الانقطاع
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # تحديد الحزم صراحةً لمنع محاولة تثبيت حزمة 'tools' القديمة المحذوفة
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platforms;android-34' 'build-tools;34.0.0' 'platform-tools'
+          packages: platforms;android-34 build-tools;34.0.0 platform-tools
 
       - name: Download and Bundle Game Data
         run: |
