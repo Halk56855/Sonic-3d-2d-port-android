@@ -1,0 +1,42 @@
+name: Build Android Port APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # تنزيل ملفات اللعبة ودمجها داخل مجلد الأصول (Assets) للتطبيق
+      - name: Download and Bundle Game Data
+        run: |
+          mkdir -p app/src/main/assets/game
+          curl -L "https://download.gamejolt.net/9b4e20660cafac91bb9c0df7185df296b09f5a9a268a5c1491d904d547713410,1794319593,7/data/games/7/220/498970/files/66e9d697b77f3/s3d2d-1.35-15-09-24.zip" -o game.zip
+          unzip game.zip -d app/src/main/assets/game
+
+      - name: Make Gradle Executable
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sonic3D2D-Android-Port
+          path: app/build/outputs/apk/debug/app-debug.apk
