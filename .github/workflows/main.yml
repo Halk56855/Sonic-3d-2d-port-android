@@ -24,9 +24,116 @@ jobs:
         with:
           packages: platforms;android-34 build-tools;34.0.0 platform-tools
 
-      - name: Download and Bundle Game Data
+      - name: Install Gradle
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gradle
+
+      - name: Create Android Project Structure Automatically
         run: |
           mkdir -p app/src/main/assets/game
+          mkdir -p app/src/main/java/com/port/game
+
+          cat << 'EOF' > build.gradle
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.1.0'
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          task clean(type: Delete) {
+              delete rootProject.buildDir
+          }
+          EOF
+
+          cat << 'EOF' > settings.gradle
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = "SonicPort"
+          include ':app'
+          EOF
+
+          cat << 'EOF' > app/build.gradle
+          plugins {
+              id 'com.android.application'
+          }
+          android {
+              namespace 'com.port.game'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.port.game"
+                  minSdk 24
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+          }
+          dependencies {
+              implementation 'androidx.appcompat:appcompat:1.6.1'
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <manifest xmlns:android="http://schemas.android.com/apk/android"
+              package="com.port.game">
+              <application
+                  android:allowBackup="true"
+                  android:label="Sonic 3D 2D"
+                  android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.action.CATEGORY_LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/port/game/MainActivity.java
+          package com.port.game;
+          import android.os.Bundle;
+          import android.webkit.WebView;
+          import androidx.appcompat.app.AppCompatActivity;
+          public class MainActivity extends AppCompatActivity {
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  WebView wv = new WebView(this);
+                  setContentView(wv);
+                  wv.getSettings().setJavaScriptEnabled(true);
+                  wv.loadUrl("file:///android_asset/game/index.html");
+              }
+          }
+          EOF
+
+          gradle wrapper
+
+      - name: Download and Bundle Game Data
+        run: |
           curl -L "https://download.gamejolt.net/9b4e20660cafac91bb9c0df7185df296b09f5a9a268a5c1491d904d547713410,1794319593,7/data/games/7/220/498970/files/66e9d697b77f3/s3d2d-1.35-15-09-24.zip" -o game.zip
           unzip game.zip -d app/src/main/assets/game
 
