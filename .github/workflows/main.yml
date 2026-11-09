@@ -24,17 +24,18 @@ jobs:
         with:
           packages: platforms;android-34 build-tools;34.0.0 platform-tools
 
-      - name: Install Gradle
+      - name: Install Gradle 7.5 Manually
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gradle
+          wget https://services.gradle.org/distributions/gradle-7.5-bin.zip
+          unzip -q gradle-7.5-bin.zip
+          sudo mv gradle-7.5 /opt/gradle
+          echo "/opt/gradle/bin" >> $GITHUB_PATH
 
       - name: Create Android Project Structure Automatically
         run: |
           mkdir -p app/src/main/assets/game
           mkdir -p app/src/main/java/com/port/game
 
-          # ملف بناء الجذر (متوافق مع جميع الإصدارات)
           cat << 'EOF' > build.gradle
           buildscript {
               repositories {
@@ -56,13 +57,11 @@ jobs:
           }
           EOF
 
-          # ملف إعدادات خفيف وبدون مشاكل
           cat << 'EOF' > settings.gradle
           rootProject.name = "SonicPort"
           include ':app'
           EOF
 
-          # إعدادات تطبيق أندرويد
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
@@ -83,7 +82,6 @@ jobs:
           }
           EOF
 
-          # ملف واجهة التطبيق AndroidManifest
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/android"
               package="com.port.game">
@@ -103,7 +101,6 @@ jobs:
           </manifest>
           EOF
 
-          # كود تشغيل اللعبة داخل التطبيق
           cat << 'EOF' > app/src/main/java/com/port/game/MainActivity.java
           package com.port.game;
           import android.os.Bundle;
