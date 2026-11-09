@@ -24,11 +24,11 @@ jobs:
         with:
           packages: platforms;android-34 build-tools;34.0.0 platform-tools
 
-      - name: Install Gradle 7.5 Manually
+      - name: Install Gradle 8.2 Manually
         run: |
-          wget https://services.gradle.org/distributions/gradle-7.5-bin.zip
-          unzip -q gradle-7.5-bin.zip
-          sudo mv gradle-7.5 /opt/gradle
+          wget https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          unzip -q gradle-8.2-bin.zip
+          sudo mv gradle-8.2 /opt/gradle
           echo "/opt/gradle/bin" >> $GITHUB_PATH
 
       - name: Create Android Project Structure Automatically
@@ -43,7 +43,7 @@ jobs:
                   mavenCentral()
               }
               dependencies {
-                  classpath 'com.android.tools.build:gradle:7.4.2'
+                  classpath 'com.android.tools.build:gradle:8.1.0'
               }
           }
           allprojects {
@@ -129,7 +129,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
