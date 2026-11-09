@@ -34,6 +34,7 @@ jobs:
           mkdir -p app/src/main/assets/game
           mkdir -p app/src/main/java/com/port/game
 
+          # ملف بناء الجذر (متوافق مع جميع الإصدارات)
           cat << 'EOF' > build.gradle
           buildscript {
               repositories {
@@ -41,7 +42,7 @@ jobs:
                   mavenCentral()
               }
               dependencies {
-                  classpath 'com.android.tools.build:gradle:8.1.0'
+                  classpath 'com.android.tools.build:gradle:7.4.2'
               }
           }
           allprojects {
@@ -55,25 +56,13 @@ jobs:
           }
           EOF
 
+          # ملف إعدادات خفيف وبدون مشاكل
           cat << 'EOF' > settings.gradle
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
-          }
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
           rootProject.name = "SonicPort"
           include ':app'
           EOF
 
+          # إعدادات تطبيق أندرويد
           cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
@@ -94,6 +83,7 @@ jobs:
           }
           EOF
 
+          # ملف واجهة التطبيق AndroidManifest
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/android"
               package="com.port.game">
@@ -113,6 +103,7 @@ jobs:
           </manifest>
           EOF
 
+          # كود تشغيل اللعبة داخل التطبيق
           cat << 'EOF' > app/src/main/java/com/port/game/MainActivity.java
           package com.port.game;
           import android.os.Bundle;
